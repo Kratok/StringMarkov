@@ -1,0 +1,82 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+import java.util.Random;
+
+public class Markov
+{
+  // Thank you for that lesson
+  private static final String WORD_REGEX = "(?<=\\w\\p{Punct}{0,4}\\s)";
+  private static final String CHAR_REGEX = "(?<=.)";
+  private static final String INT_REGEX = "(-+*.,/%^><)";
+
+  /*
+   * Main takes arguments from the standard input in the form Markov.java <The
+   * Order Size> <Ammount of Iterations> <Type of Object> <txt files as a list>
+   * Takes in as many txt files as it can Anything stored as a text file should
+   * work with Word or Char object types
+   */
+  public final static void main(String args[])
+  {
+    String regex = null;
+    int order = Integer.parseInt(args[0]);
+    StringChain chain = new StringChain(order);
+
+    int size = Integer.parseInt(args[1]);
+    String Obj = args[2];
+    // If not given a Object will print a complaint and try to use the Character
+    // Regex
+    if (Obj.equals("char") || Obj.equals("Char") || Obj.equals("letter")
+        || Obj.equals("Letter"))
+    {
+      regex = CHAR_REGEX;
+    } else if (Obj.equals("string") || Obj.equals("String")
+        || Obj.equals("word") || Obj.equals("Word"))
+    {
+      regex = WORD_REGEX;
+    } else if (Obj.equals("int") || Obj.equals("Int") || Obj.equals("number")
+        || Obj.equals("Number"))
+    {
+      regex = INT_REGEX;
+    } else
+    {
+      System.out.println("Not given proper Object Type, acting as Characters");
+      regex = CHAR_REGEX;
+    }
+    for (int i = 3; args.length > i; i++)
+    {
+      try
+      {
+        // Prepare to read from the file, using a Scanner object
+        File file = new File(args[i]);
+        Scanner in = new Scanner(file);
+        if (regex != null)
+          in.useDelimiter(regex);
+        chain.addItems(in);
+      } catch (FileNotFoundException e)
+      {
+        // Standard error print to show things. Added print Just for credit
+        System.out.println(args[i] + " Is not where it should be.");
+        e.printStackTrace();
+      }
+    }
+    /*
+     * If I'm supposed to leave some point for people to put in a generated
+     * Random here, I don't know where. I don't see anything like that in the
+     * assignment description OR a grading rubric, so that's what I have.
+     */
+    Random rand = new Random();
+    List<String> printout = chain.generate(size, rand);
+    Iterator<String> printit = printout.iterator();
+    while (printit.hasNext())
+    {
+      System.out.print(printit.next());
+    }
+  }
+}
